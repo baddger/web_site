@@ -1,0 +1,82 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<html>
+		<style>
+    body {
+        background-color: black;
+        background-image: url('texture.jpg');
+        background-attachment: fixed;
+        background-size: cover; /* Optional: To cover the entire viewport */
+        background-position: center; /* Optional: To center the image */
+        color: white;
+        gap: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    @font-face {
+        font-family: 'YourCustomFont';
+        /* Name you want to use for the font */
+        src: url('fonts/YourFont.otf') format('opentype');
+        /* Path to your OTF file */
+        src: url('fonts/thenightwatch.ttf') format('truetype');
+        /* Path to your OTF file */
+        src: url('fonts/Monor_Regular.otf') format('opentype');
+        /* Path to your OTF file */
+        font-weight: normal;
+        /* Set the weight (normal, bold, etc.) */
+        font-style: normal;
+        /* Set the style (normal, italic, etc.) */
+    }
+
+
+    .grid_table {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 3 columns here */
+            gap: 40px; /* Optional: gap between grid items */
+        }
+
+    .title_style {
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 66px;
+    }
+	
+	        .hidden {
+            display: none;
+        }
+
+
+
+    .movie_table {
+        gap: 40px;
+        display: flex;
+        /*flex-direction: column;*/
+        flex-wrap: wrap;
+
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+		<body >
+			<div class="title_style">   </div>
+			<div class="title_style"> DRONE </div>
+
+			<div class="title_style">---</div>
+
+			<div class="movie_table">
+			<iframe width="560" height="315" src="https://www.youtube.com/embed/Z4y9pE0Y6IE?si=TGMvou5Hq1llNTuX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+			</div>
+			<div class="title_style">---</div>
+
+			<div class="movie_table">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BEN6am6dts8?si=SUw7UydTyT2q2Inf" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+			</div>
+			<div class="title_style">---</div>
+
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/N2yd4slXhgw?si=VR-aGTo8qpYih63m" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+		</body>
+	</html>

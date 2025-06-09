@@ -1,0 +1,351 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<html>
+
+<script>
+    // Ensure the DOM elements are loaded before attaching event listeners
+    window.onload = function() {
+
+        /// ON LOAD CALCULATED TEXT SIZE FOR MOVIE TITLE
+        const elements = document.querySelectorAll('.title_tag2');
+        Array.from(elements).forEach((element, index) => {
+            length = element.textContent.length;
+            element.style.fontSize = 1000/length + "px";
+        });
+
+
+        init_filter = function() {
+            const movie_divs = document.querySelectorAll('.movie_div');
+            let numbers = [];
+            let directors = [];
+            Array.from(movie_divs).forEach((element, index) => {
+
+                
+                const movie_year = element.getAttribute('year');
+                const movie_director = element.getAttribute('director');
+                const movie_vote_average = element.getAttribute('vote_average');
+                if (element.style.display == "" || element.style.display == "flex") {
+                    numbers.push(parseInt(movie_year));
+                    directors.push(movie_director);
+                } 
+
+            });
+
+            const filter_year = document.getElementById('filter_year');
+            const filter_director = document.getElementById('filter_director');
+            filter_year.innerHTML = "";
+            filter_director.innerHTML = "";
+            const default_years = document.createElement('option');
+            default_years.text = "---";
+            default_years.value = "";
+            filter_year.appendChild(default_years);
+            const default_director = document.createElement('option');
+            default_director.text = "---";
+            default_director.value = "";
+            filter_director.appendChild(default_director);
+
+
+            const uniqueSet = new Set(numbers);
+            numbers = [...uniqueSet];
+            numbers.sort((a, b) => a - b);
+            for (let number of numbers) {
+                const option1 = document.createElement('option');
+                option1.text = number;
+                option1.value = number;
+                filter_year.appendChild(option1);
+            }
+
+            const directorsSet = new Set(directors);
+            directors = [...directorsSet];
+            directors.sort((a, b) => a - b);
+            for (let director of directors) {
+                const option1 = document.createElement('option');
+                option1.text = director;
+                option1.value = director;
+                filter_director.appendChild(option1);
+            }
+        }
+        init_filter()
+
+        filter_movie = function() {
+            const filter_year = document.getElementById('filter_year');
+            const selected_year = filter_year.value;
+            const filter_director = document.getElementById('filter_director');
+            const selected_director = filter_director.value;
+
+            const filter_note = document.getElementById('filter_note');
+            const selected_note = filter_note.value;
+
+            const movie_div = document.querySelectorAll('.movie_div');
+            Array.from(movie_div).forEach((element, index) => {
+
+                let show = true;
+
+
+                const movie_year = element.getAttribute('year');
+                const movie_director = element.getAttribute('director');
+                const movie_vote_average = element.getAttribute('vote_average');
+
+                if(selected_year != "") {
+                    let year_match = selected_year == movie_year;
+                    show = show && year_match;
+                }
+                if(selected_director != "") {
+                    let director_match = selected_director == movie_director;
+                    show = show && director_match;
+                }
+                if(selected_note != "") {
+                    let note_match = parseInt(movie_vote_average) >= parseInt(selected_note);
+                    show = show && note_match;
+                }
+                console.log(selected_director);
+
+                if (show) {
+                    element.style.display = "flex";
+                } else {
+                    element.style.display = "none";
+                }
+            });
+
+
+            init_filter();
+            filter_year.value = selected_year;
+            filter_director.value = selected_director;
+            filter_note.value = selected_note;
+        }
+
+
+        document.getElementById('filter_year').addEventListener('change', function() {
+            filter_movie()
+        });
+        document.getElementById('filter_director').addEventListener('change', function() {
+            filter_movie()
+        });
+        document.getElementById('filter_note').addEventListener('change', function() {
+            filter_movie()
+        });
+        document.getElementById('resetFilter').addEventListener('click', function() {
+            let filter = document.getElementById('filter_year');
+            filter.selectedIndex = 0;
+            filter = document.getElementById('filter_director');
+            filter.selectedIndex = 0;
+            filter = document.getElementById('filter_note');
+            filter.selectedIndex = 0;
+            filter_movie()
+
+        });
+        
+
+        sort_movie = function(id_to_sort) {
+            // Get the container that holds the items
+            const container = document.getElementById('movie_table');
+            // Convert HTMLCollection (NodeList) to an array
+            const itemsArray = Array.from(container.children);
+            // Sort the array of list items
+            itemsArray.sort((a, b) => a.querySelector('#' + id_to_sort).textContent.localeCompare(b
+                .querySelector('#' + id_to_sort)
+                .textContent));
+            // Clear the container
+            container.innerHTML = '';
+            // Append the sorted items back to the container
+            itemsArray.forEach(item => container.appendChild(item));
+        }
+        document.getElementById('sortBtnName').addEventListener('click', function() {
+            sort_movie('title')
+        });
+        document.getElementById('sortBtnYear').addEventListener('click', function() {
+            sort_movie('year')
+        });
+        document.getElementById('sortBtnNote').addEventListener('click', function() {
+            sort_movie('note')
+        });
+        document.getElementById('sortBtnDirector').addEventListener('click', function() {
+            sort_movie('director')
+        });
+    };
+</script>
+<style>
+    body {
+        background-color: black;
+        background-image: url('texture06.jpg');
+        background-attachment: fixed;
+        background-size: cover; /* Optional: To cover the entire viewport */
+        background-position: center; /* Optional: To center the image */
+        color: white;
+        gap: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+
+    .Hcontainer {
+        display: flex;
+
+        flex-direction: row;
+
+    }
+
+    .Vcontainer {
+        display: flex;
+        flex-direction: column;
+
+    }
+
+
+    @font-face {
+        font-family: 'YourCustomFont';
+        /* Name you want to use for the font */
+        src: url('fonts/YourFont.otf') format('opentype');
+        /* Path to your OTF file */
+        src: url('fonts/thenightwatch.ttf') format('truetype');
+        /* Path to your OTF file */
+        src: url('fonts/Monor_Regular.otf') format('opentype');
+        /* Path to your OTF file */
+        font-weight: normal;
+        /* Set the weight (normal, bold, etc.) */
+        font-style: normal;
+        /* Set the style (normal, italic, etc.) */
+    }
+
+    .movie_div {
+        padding: 10;
+        border-radius: 5px;         /* Rounded corners */
+        background-color: #000000;
+        background-image: url('texture04.jpg');
+        background-size: 2000px 2000px;
+        /* Green background for items */
+        align-items: center;
+        /* Adds 20px spacing between flex items */
+        max-width: 1000px;
+        /* Set your desired max-width here */
+        justify-content: center;
+        /* Centers content horizontally */
+        align-items: center;
+        /* Centers content vertically */
+    }
+
+    .movie_table {
+        gap: 40px;
+        display: flex;
+        /*flex-direction: column;*/
+        flex-wrap: wrap;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    .movie_element {
+        text-align: center;
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        margin: auto;
+
+    }
+
+    .director_element {
+        text-align: center;
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        margin: auto;
+
+    }
+
+    .expand {
+        flex-grow: 1;
+    }
+
+    .column_info {
+        padding-top: 35px;
+        padding-left: 5px;
+        padding-right: 5px;
+        gap: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .image {
+        margin-left: 100px;
+    }
+    .sort_button {
+        background-color: rgba(0, 0, 0, 1);
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;   
+    }  
+
+    .filter_button {
+        background-color: rgba(0, 0, 0, 1);
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        border: none;
+        color: white;
+        padding: 15px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;   
+    }  
+    .title_style {
+        font-family: 'YourCustomFont', sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 350px;
+        height: 80px;
+        padding-left: 10px;
+    }
+
+</style>
+
+<body>
+    <div class="Hcontainer">
+        <button class="sort_button" id="sortBtnName">SORT BY NAME</button>
+        <button class="sort_button" id="sortBtnYear">SORT BY YEARS</button>
+        <button class="sort_button" id="sortBtnNote">SORT BY NOTE</button>
+        <button class="sort_button" id="sortBtnDirector">SORT BY DIRECTOR</button>    
+    </div>
+    <div class="Hcontainer" style="gap: 0px;">
+        <label for="country" class="filter_button" >FILTERS</label>
+
+
+        <label for="country" style="margin-left: 10px;" class="filter_button" >YEARS</label>
+        <select id="filter_year" class="filter_button">
+            <option value="">---</option>
+        </select>  
+        <label for="country" style="margin-left: 10px;" class="filter_button" >DIRECTOR</label>
+        <select id="filter_director" class="filter_button">
+            <option value="">---</option>
+        </select>  
+        <label for="country" style="margin-left: 10px;" class="filter_button" >MIN NOTE</label>
+        <select id="filter_note" class="filter_button">
+            <option value="">---</option>
+            <option value="9">9 an more</option>
+            <option value="8">8 an more</option>
+            <option value="7">7 an more</option>
+            <option value="6">6 an more</option>
+            <option value="5">5 an more</option>
+            <option value="4">4 an more</option>
+            <option value="3">3 an more</option>
+            <option value="2">2 an more</option>
+            <option value="1">1 an more</option>
+
+        </select>  
+        <button style="margin-left: 10px;" class="filter_button" id="resetFilter">RESET</button>
+
+    </div>
+    <div id="movie_table" class="movie_table">
+    </div>
+</body>
+
+</html>
