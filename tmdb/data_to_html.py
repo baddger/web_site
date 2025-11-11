@@ -7,7 +7,7 @@ script_dir = os.path.dirname(__file__)
 # Set the working directory to the script's directory
 os.chdir(script_dir)
 
-directory_path = "../tmdb_data"
+directory_path = "tmdb_data"
 
 def get_movie_infos(movie_dir):
     data_file_path = directory_path + '/' + movie_dir + '/' + 'data'
@@ -227,10 +227,10 @@ for movie_dir in directory_list:
     csv_data += vsc_info + '\n'
 
 
-with open("../result/output.html", "w", encoding = 'utf-8') as file: 
+with open("../movie.html", "w", encoding = 'utf-8') as file: 
     
     # prettify the soup object and convert it into a string   
     file.write(str(soup.prettify()))
 
-with open("../result/info.csv", "w") as file:
+with open("info.csv", "w") as file:
     file.write(csv_data)

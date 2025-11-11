@@ -12,7 +12,7 @@ os.chdir(script_dir)
 
 api_key = 'api_key=aa6f28690f0d7b328c28c663a992bd70'
 file_path = 'top_movie.txt'
-data_directory = '../tmdb_data'
+data_directory = 'tmdb_data'
 tmdb_adress = 'https://api.themoviedb.org'
 def search_movie(query):
 
