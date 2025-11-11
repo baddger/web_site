@@ -1,0 +1,52 @@
+Alien;1979
+Aliens;1986
+Alien³;1992
+Alien Resurrection;1997
+Death Proof;2007
+The Holy Mountain;1973
+Kill Bill: Vol. 1;2003
+Kill Bill: Vol. 2;2004
+Four Rooms;1995
+Avatar: The Way of Water;2022
+Bigbug;2022
+Don't Look Up;2021
+Hard to Be a God;2013
+The Royal Tenenbaums;2001
+Sorcerer;1977
+Spring Breakers;2013
+The Jesus Rolls;2019
+The Suicide Squad;2021
+The Thing;1982
+1917;2019
+Alita: Battle Angel;2019
+Amadeus;1984
+Buffet Froid;1979
+Deliverance;1972
+Don't Breathe;2016
+Dune;1984
+Evil Dead;2013
+Raw;2016
+Hereditary;2018
+John Wick;2014
+Let the Corpses Tan;2017
+The Mule;2018
+The Clink of Ice;2010
+The Departed;2006
+The Wind Rises;2013
+Mandy;2018
+Maps to the Stars;2014
+Mission: Impossible - Fallout;2018
+No Country for Old Men;2007
+Parasite;2019
+Piranha 3D;2010
+Phantom Thread;2017
+Pokémon Detective Pikachu;2019
+Snowpiercer;2013
+Princess Mononoke;1997
+Spider-Man: Into the Spider-Verse;2018
+Swiss Army Man;2016
+Starman;1984
+The Big Short;2015
+The Endless;2017
+The Platform;2019
+The Void;2016

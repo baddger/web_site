@@ -11,7 +11,7 @@ os.chdir(script_dir)
 
 
 api_key = 'api_key=aa6f28690f0d7b328c28c663a992bd70'
-file_path = '../../art_list/top_movie.txt'
+file_path = 'top_movie.txt'
 data_directory = '../tmdb_data'
 tmdb_adress = 'https://api.themoviedb.org'
 def search_movie(query):
@@ -55,7 +55,7 @@ def save_data(query):
     movie_details = get_movie_details(id_movie)
     movie_cast = get_cast_details(id_movie)
     file_id = get_file_id(movie_info)
-    file_dir = data_directory + '/' + file_id
+    file_dir = data_directory + '/' + file_id.replace(":","")
 
     os.makedirs(file_dir, exist_ok=True)
 
