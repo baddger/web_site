@@ -1,0 +1,2831 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<html>
+ <script>
+  // Ensure the DOM elements are loaded before attaching event listeners
+    window.onload = function() {
+
+        /// ON LOAD CALCULATED TEXT SIZE FOR MOVIE TITLE
+        const elements = document.querySelectorAll('.title_tag2');
+        Array.from(elements).forEach((element, index) => {
+            length = element.textContent.length;
+            element.style.fontSize = 1000/length + "px";
+        });
+
+
+
+
+        init_filter = function() {
+            const movie_divs = document.querySelectorAll('.movie_div');
+            let numbers = [];
+            let directors = [];
+            Array.from(movie_divs).forEach((element, index) => {
+
+                
+                const movie_year = element.getAttribute('year');
+                const movie_director = element.getAttribute('director');
+                const movie_vote_average = element.getAttribute('vote_average');
+                if (element.style.display == "" || element.style.display == "flex") {
+                    numbers.push(parseInt(movie_year));
+                    directors.push(movie_director);
+                } 
+
+            });
+
+            const filter_year = document.getElementById('filter_year');
+            const filter_director = document.getElementById('filter_director');
+            filter_year.innerHTML = "";
+            filter_director.innerHTML = "";
+            const default_years = document.createElement('option');
+            default_years.text = "---";
+            default_years.value = "";
+            filter_year.appendChild(default_years);
+            const default_director = document.createElement('option');
+            default_director.text = "---";
+            default_director.value = "";
+            filter_director.appendChild(default_director);
+
+
+            const uniqueSet = new Set(numbers);
+            numbers = [...uniqueSet];
+            numbers.sort((a, b) => a - b);
+            for (let number of numbers) {
+                const option1 = document.createElement('option');
+                option1.text = number;
+                option1.value = number;
+                filter_year.appendChild(option1);
+            }
+
+            const directorsSet = new Set(directors);
+            directors = [...directorsSet];
+            directors.sort((a, b) => a - b);
+            for (let director of directors) {
+                const option1 = document.createElement('option');
+                option1.text = director;
+                option1.value = director;
+                filter_director.appendChild(option1);
+            }
+        }
+        init_filter()
+
+        filter_movie = function() {
+            const filter_year = document.getElementById('filter_year');
+            const selected_year = filter_year.value;
+            const filter_director = document.getElementById('filter_director');
+            const selected_director = filter_director.value;
+
+            const filter_note = document.getElementById('filter_note');
+            const selected_note = filter_note.value;
+
+            const movie_div = document.querySelectorAll('.movie_div');
+            Array.from(movie_div).forEach((element, index) => {
+
+                let show = true;
+
+
+                const movie_year = element.getAttribute('year');
+                const movie_director = element.getAttribute('director');
+                const movie_vote_average = element.getAttribute('vote_average');
+
+                if(selected_year != "") {
+                    let year_match = selected_year == movie_year;
+                    show = show && year_match;
+                }
+                if(selected_director != "") {
+                    let director_match = selected_director == movie_director;
+                    show = show && director_match;
+                }
+                if(selected_note != "") {
+                    let note_match = parseInt(movie_vote_average) >= parseInt(selected_note);
+                    show = show && note_match;
+                }
+                console.log(selected_director);
+
+                if (show) {
+                    element.style.display = "flex";
+                } else {
+                    element.style.display = "none";
+                }
+            });
+
+
+            init_filter();
+            filter_year.value = selected_year;
+            filter_director.value = selected_director;
+            filter_note.value = selected_note;
+        }
+
+
+        document.getElementById('filter_year').addEventListener('change', function() {
+            filter_movie()
+        });
+        document.getElementById('filter_director').addEventListener('change', function() {
+            filter_movie()
+        });
+        document.getElementById('filter_note').addEventListener('change', function() {
+            filter_movie()
+        });
+        document.getElementById('resetFilter').addEventListener('click', function() {
+            let filter = document.getElementById('filter_year');
+            filter.selectedIndex = 0;
+            filter = document.getElementById('filter_director');
+            filter.selectedIndex = 0;
+            filter = document.getElementById('filter_note');
+            filter.selectedIndex = 0;
+            filter_movie()
+
+        });
+        
+
+        sort_movie = function(id_to_sort) {
+            // Get the container that holds the items
+            const container = document.getElementById('movie_table');
+            // Convert HTMLCollection (NodeList) to an array
+            const itemsArray = Array.from(container.children);
+            // Sort the array of list items
+            itemsArray.sort((a, b) => a.querySelector('#' + id_to_sort).textContent.localeCompare(b
+                .querySelector('#' + id_to_sort)
+                .textContent));
+            // Clear the container
+            container.innerHTML = '';
+            // Append the sorted items back to the container
+            itemsArray.forEach(item => container.appendChild(item));
+        }
+        document.getElementById('sortBtnName').addEventListener('click', function() {
+            sort_movie('title')
+        });
+        document.getElementById('sortBtnYear').addEventListener('click', function() {
+            sort_movie('year')
+        });
+        document.getElementById('sortBtnNote').addEventListener('click', function() {
+            sort_movie('note')
+        });
+        document.getElementById('sortBtnDirector').addEventListener('click', function() {
+            sort_movie('director')
+        });
+    };
+ </script>
+ <style>
+  body {
+        background-color: black;
+        background-image: url('texture06.jpg');
+        background-attachment: fixed;
+        background-size: cover; /* Optional: To cover the entire viewport */
+        background-position: center; /* Optional: To center the image */
+        color: white;
+        gap: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+
+    .Hcontainer {
+        display: flex;
+
+        flex-direction: row;
+
+    }
+
+    .Vcontainer {
+        display: flex;
+        flex-direction: column;
+
+    }
+
+
+    @font-face {
+        font-family: 'YourCustomFont';
+        /* Name you want to use for the font */
+        src: url('fonts/YourFont.otf') format('opentype');
+        /* Path to your OTF file */
+        src: url('fonts/thenightwatch.ttf') format('truetype');
+        /* Path to your OTF file */
+        src: url('fonts/Monor_Regular.otf') format('opentype');
+        /* Path to your OTF file */
+        font-weight: normal;
+        /* Set the weight (normal, bold, etc.) */
+        font-style: normal;
+        /* Set the style (normal, italic, etc.) */
+    }
+
+    .movie_div {
+        padding: 10;
+        border-radius: 5px;         /* Rounded corners */
+        background-color: #000000;
+        background-image: url('texture04.jpg');
+        background-size: 2000px 2000px;
+        /* Green background for items */
+        align-items: center;
+        /* Adds 20px spacing between flex items */
+        max-width: 1000px;
+        /* Set your desired max-width here */
+        justify-content: center;
+        /* Centers content horizontally */
+        align-items: center;
+        /* Centers content vertically */
+    }
+
+    .movie_table {
+        gap: 40px;
+        display: flex;
+        /*flex-direction: column;*/
+        flex-wrap: wrap;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    .movie_element {
+        text-align: center;
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        margin: auto;
+
+    }
+
+    .director_element {
+        text-align: center;
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        margin: auto;
+
+    }
+
+    .expand {
+        flex-grow: 1;
+    }
+
+    .column_info {
+        padding-top: 35px;
+        padding-left: 5px;
+        padding-right: 5px;
+        gap: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .image {
+        margin-left: 100px;
+    }
+    .sort_button {
+        background-color: rgba(0, 0, 0, 1);
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;   
+    }  
+
+    .filter_button {
+        background-color: rgba(0, 0, 0, 1);
+        font-family: 'YourCustomFont', sans-serif;
+        font-size: 20px;
+        border: none;
+        color: white;
+        padding: 15px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;   
+    }  
+    .title_style {
+        font-family: 'YourCustomFont', sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 350px;
+        height: 80px;
+        padding-left: 10px;
+    }
+ </style>
+ <body>
+  <div class="Hcontainer">
+   <button class="sort_button" id="sortBtnName">
+    SORT BY NAME
+   </button>
+   <button class="sort_button" id="sortBtnYear">
+    SORT BY YEARS
+   </button>
+   <button class="sort_button" id="sortBtnNote">
+    SORT BY NOTE
+   </button>
+   <button class="sort_button" id="sortBtnDirector">
+    SORT BY DIRECTOR
+   </button>
+  </div>
+  <div class="Hcontainer" style="gap: 0px;">
+   <label class="filter_button" for="country">
+    FILTERS
+   </label>
+   <label class="filter_button" for="country" style="margin-left: 10px;">
+    YEARS
+   </label>
+   <select class="filter_button" id="filter_year">
+    <option value="">
+     ---
+    </option>
+   </select>
+   <label class="filter_button" for="country" style="margin-left: 10px;">
+    DIRECTOR
+   </label>
+   <select class="filter_button" id="filter_director">
+    <option value="">
+     ---
+    </option>
+   </select>
+   <label class="filter_button" for="country" style="margin-left: 10px;">
+    MIN NOTE
+   </label>
+   <select class="filter_button" id="filter_note">
+    <option value="">
+     ---
+    </option>
+    <option value="9">
+     9 an more
+    </option>
+    <option value="8">
+     8 an more
+    </option>
+    <option value="7">
+     7 an more
+    </option>
+    <option value="6">
+     6 an more
+    </option>
+    <option value="5">
+     5 an more
+    </option>
+    <option value="4">
+     4 an more
+    </option>
+    <option value="3">
+     3 an more
+    </option>
+    <option value="2">
+     2 an more
+    </option>
+    <option value="1">
+     1 an more
+    </option>
+   </select>
+   <button class="filter_button" id="resetFilter" style="margin-left: 10px;">
+    RESET
+   </button>
+  </div>
+  <div class="movie_table" id="movie_table">
+   <div class="movie_div Hcontainer" director="James Cameron" vote_average="7.9" year="1986">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/r1x5JGpyqZU8PYhbs4UcrO1Xb6x.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Aliens
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1986
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         James Cameron
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/9NAZnTjBQ9WcXAQEzZpKy4vdQto.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/jMBpJFRtrtIXymer93XLavPwI3P.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Clint Eastwood" vote_average="6.8" year="2018">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/oeZh7yEz3PMnZLgBPhrafFHRbVz.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Mule
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2018
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.8
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Clint Eastwood
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/dU35NnjZ4aGw5abIJe3WXVf3Eey.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/cw8bDntgx28AV1QJFzkEEewzRvk.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Quentin Tarantino" vote_average="6.8" year="2007">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/vtu6H4NWnQVqEp3aanUq3hNeeot.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Death Proof
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2007
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.8
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Quentin Tarantino
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/1gjcpAa99FAOWGnrUvHEXXsRs7o.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/xRpQkuQr4loiLiks2T15TanM2m2.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Bob Persichetti" vote_average="8.4" year="2018">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Spider-Man: Into the Spider-Verse
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2018
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Bob Persichetti
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/cNd5VyMI3sNgiHOwLIB7WDiH128.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/qGQf2OHIkoh89K8XeKQzhxczf96.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Rob Letterman" vote_average="6.9" year="2019">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/uhWvnFgg3BNlcUz0Re1HfQqIcCD.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Pokémon Detective Pikachu
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2019
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Rob Letterman
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/bgsnUXYPWsRDuo3B0f9wthXKxll.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/nDP33LmQwNsnPv29GQazz59HjJI.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Sam Mendes" vote_average="8.0" year="2019">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/iZf0KyrE25z1sage4SYFLCCrMi9.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       1917
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2019
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.0
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Sam Mendes
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/5z89X9rB76JDblqMQ52fviwXxAN.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/76LpPdXtCf4WxWDagVT2YcF4e9g.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Harmony Korine" vote_average="5.2" year="2013">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/3A1XjFB59rWwx92fM97s94RcBL3.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Spring Breakers
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2013
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         5.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Harmony Korine
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/nifHx1FlQdgYw57QaUfHSjBKmPy.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/eINHLmQNce1UoLuKlqKBvJK12Sd.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Christopher McQuarrie" vote_average="7.4" year="2018">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Mission: Impossible - Fallout
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2018
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Christopher McQuarrie
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/7FcybX1uFpMKHSI0p15LGPG3O3x.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/3IzR3VhZAyhxVnuRRUHFLkfK4hT.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="William Friedkin" vote_average="7.4" year="1977">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/2b7oexm173SF1FSEq0DdgxZZNRH.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Sorcerer
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1977
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         William Friedkin
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/jKPmxwyEeGUCIQUiisXJcxtm9Hs.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/5CQ6Qn1ujXRs21BtvAuJxHfL1sF.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Hayao Miyazaki" vote_average="8.3" year="1997">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/cMYCDADoLKLbB83g4WnJegaZimC.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Princess Mononoke
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1997
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.3
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Hayao Miyazaki
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/mG3cfxtA5jqDc7fpKgyzZMKoXDh.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/gl0jzn4BupSbL2qMVeqrjKkF9Js.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="John Carpenter" vote_average="8.1" year="1982">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/tzGY49kseSE9QAKk47uuDGwnSCu.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Thing
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1982
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.1
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         John Carpenter
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/3Qp0mg61u1qSZNJh30BFEUZrIMG.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/oVa4o0C5Fa7G36qHY48n3KHGBDX.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Panos Cosmatos" vote_average="6.2" year="2018">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/m0yf7J7HsKeK6E81SMRcX8vx6mH.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Mandy
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2018
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Panos Cosmatos
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/rGjZWiTtr21BZ1fpntREEuSnEqg.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/vv1l1WzwED9r6ZVUw1xTfvaSiPW.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Julia Ducournau" vote_average="7.1" year="2016">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/kc8jT1MAiKM0iwdjAwC5lQrTNry.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Raw
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2016
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.1
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Julia Ducournau
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/cAJtfXQyOGGh2CLPHhzVBcNNQaT.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/eUuPoLhQ0HYk6N72NVsESy8sEYg.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Bong Joon-ho" vote_average="6.9" year="2013">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/nzccOvhrLGI0nvAknCEAk8bchD9.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Snowpiercer
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2013
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Bong Joon-ho
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/tKLJBqbdH6HFj2QxLA5o8Zk7IVs.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/33dV6HAnXBmwKl640gO3U4auqUN.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Robert Rodriguez" vote_average="7.2" year="2019">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/xRWht48C2V8XNfzvPehyClOvDni.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Alita: Battle Angel
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2019
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Robert Rodriguez
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/bPqRdLWWwpOT8sBdj9PWOzNgwou.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/lcCNS7vyofFpJV7fl92ipIdNmGi.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Ari Aster" vote_average="7.3" year="2018">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/p9fmuz2Oj3HtEJEqbIwkFGUhVXD.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Hereditary
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2018
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.3
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Ari Aster
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/ucJtVUAqLkaBNGxaLyY7IBOvAEC.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/4DUoPZOHdPuROP4nyEIsPaMIiQl.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Fede Álvarez" vote_average="7.0" year="2016">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/kkUMGON2uFRlxI3zIMFdjqARnbb.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Don't Breathe
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2016
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.0
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Fede Álvarez
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/f8KjBkmqAyNGTUkZh1oYIURP4id.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/20rdYjWhr1UrOm76zNS4Wx7DU0M.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Paul Thomas Anderson" vote_average="7.3" year="2017">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/hgoWjp9Sh0MI97eAMZCnIoVfgvq.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Phantom Thread
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2017
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.3
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Paul Thomas Anderson
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/wKAs2LtLYSUzt3ZZ8pnxMwuEWuR.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/vpRMzPqHC03I7hPPET4Av2OT8dI.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Aaron Moorhead" vote_average="6.3" year="2017">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/49sb3kEZplzudQBhJDSt0mNJm4V.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Endless
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2017
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.3
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Aaron Moorhead
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/plvZ27ya8yxyyqSCHbwBMjFfJwS.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/zX0pEwk0zDnS85Nxl1hI6h6dfFu.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Alejandro Jodorowsky" vote_average="7.6" year="1973">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/nvwbOcV3jJExT090Bb2m7fNjzTN.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Holy Mountain
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1973
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.6
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Alejandro Jodorowsky
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/rNLy0GHNAdq4TpWOY0yVEnc1lyb.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/35uGiE6AFbZBUCqcYGPANLuuoMn.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Galder Gaztelu-Urrutia" vote_average="7.0" year="2019">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/8ZX18L5m6rH5viSYpRnTSbb9eXh.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Platform
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2019
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.0
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Galder Gaztelu-Urrutia
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/rAPQ6GjKHbmD0zuwizhu5g3GlCB.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/3tkDMNfM2YuIAJlvGO6rfIzAnfG.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Bertrand Blier" vote_average="5.9" year="2010">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/tG0x1kQqtCeo2eQ6fr2GCenhY1m.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Clink of Ice
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2010
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         5.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Bertrand Blier
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/2xd1VtwC1bEb40udl7TPO05lzrg.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/kbyuph2mK7q7SNYpO7DBTLWxCig.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Chad Stahelski" vote_average="7.4" year="2014">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       John Wick
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2014
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Chad Stahelski
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/eRCryGwKDH4XqUlrdkERmeBWPo8.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/ipyxbPJrLB1g9AfHq4xH5nLWmew.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Bertrand Blier" vote_average="7.1" year="1979">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/j6Yzrhn9bSwJprYTYl0xIC4NNPi.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Buffet Froid
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1979
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.1
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Bertrand Blier
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/2xd1VtwC1bEb40udl7TPO05lzrg.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/vEjdGYz6slDQg7QE7EbRpDs0H7D.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Allison Anders" vote_average="5.8" year="1995">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/75aHn1NOYXh4M7L5shoeQ6NGykP.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Four Rooms
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1995
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         5.8
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Allison Anders
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/tP9x5lWT4EofhiGITfnmmfpZShA.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/f2t4JbUvQIjUF5FstG1zZFAp02N.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Steven Kostanski" vote_average="6.0" year="2016">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/c0WLRyT0AmUi41nVXBnqmJshIBn.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Void
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2016
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.0
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Steven Kostanski
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/7nXlOIJcc0Zm2IjzUvnoNS7nx5C.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/oZwwwezJFlHmQGBRJDLmENXwOIt.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Martin Scorsese" vote_average="8.2" year="2006">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/nT97ifVT2J1yMQmeq20Qblg61T.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Departed
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2006
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Martin Scorsese
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/9U9Y5GQuWX3EZy39B8nkk4NY01S.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/6WRrGYalXXveItfpnipYdayFkQB.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="James Cameron" vote_average="7.6" year="2022">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Avatar: The Way of Water
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2022
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.6
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         James Cameron
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/9NAZnTjBQ9WcXAQEzZpKy4vdQto.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/8rpDcsfLJypbO6vREc0547VKqEv.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Jean-Pierre Jeunet" vote_average="5.3" year="2022">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/jDJOojbuqgnNVGmKgmuYzBpaIgP.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Bigbug
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2022
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         5.3
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Jean-Pierre Jeunet
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/4DhPaNaxYnkgxVJHVLyL5gKmKpG.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/uQUquwEvPuCg0ACRxU5NiCGgJLN.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="John Turturro" vote_average="4.5" year="2019">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/wxXZXYNn1H5eVRbpTZVFvWBvjlY.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Jesus Rolls
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2019
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         4.5
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         John Turturro
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/6O9W9cJW0kCqMzYeLupV9oH0ftn.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/3KdB5i4dQn4WGKXoWoHYmVcDjwf.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="David Fincher" vote_average="6.4" year="1992">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/xh5wI0UoW7DfS1IyLy3d2CgrCEP.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Alien³
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1992
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         David Fincher
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/tpEczFclQZeKAiCeKZZ0adRvtfz.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/nEmOmbCWBXS3tHU2N49z693KDK.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Hélène Cattet" vote_average="6.1" year="2017">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/6ICClwFC6zeX0SFso80AuieQN5R.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Let the Corpses Tan
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2017
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.1
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Hélène Cattet
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/zj3MfYsryox2qokrJMxt1UOvTBA.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/q0U6WLOkuiyXTRlMfd9dvvRqdQT.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="John Carpenter" vote_average="6.9" year="1984">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/cgDeFWkYi6e9FT5RiQPCbQ9HlXZ.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Starman
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1984
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         John Carpenter
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/3Qp0mg61u1qSZNJh30BFEUZrIMG.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/fny1B9hmVilFtU3RRjkMZffBjUi.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Ethan Coen" vote_average="7.9" year="2007">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/bj1v6YKF8yHqA489VFfnQvOJpnc.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       No Country for Old Men
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2007
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Ethan Coen
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/ccvoiEe3gEMAth1Oy8SJxVeMcAk.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/kd9jFTTabg4xJpHDgxY0h8F9BzG.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Adam McKay" vote_average="7.1" year="2021">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/th4E1yqsE8DGpAseLiUrI60Hf8V.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Don't Look Up
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2021
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.1
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Adam McKay
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/vOyZXNJq7Oo01LPtSD5AZHjctgH.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/w4mdpbqx0NqsgNKZ170U0QDcyl3.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Bong Joon-ho" vote_average="8.5" year="2019">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Parasite
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2019
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.5
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Bong Joon-ho
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/tKLJBqbdH6HFj2QxLA5o8Zk7IVs.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/8eihUxjQsJ7WvGySkVMC0EwbPAD.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Miloš Forman" vote_average="8.0" year="1984">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/1n5VUlCqgmVax1adxGZm8oCFaKc.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Amadeus
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1984
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.0
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Miloš Forman
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/ypWY2o3oikT2LTAQcCPAcUi4zqG.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/pD5Z6YglDNcRhcrCJKDhJlbGzni.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Adam McKay" vote_average="7.4" year="2015">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/scVEaJEwP8zUix8vgmMoJJ9Nq0w.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Big Short
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2015
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Adam McKay
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/vOyZXNJq7Oo01LPtSD5AZHjctgH.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/i7UCf0ysjbYYaqcSKUox9BJz4Kp.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="James Gunn" vote_average="7.5" year="2021">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/kb4s0ML0iVZlG6wAKbbs9NAm6X.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Suicide Squad
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2021
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.5
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         James Gunn
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/pnKqZub3IlKYbyH9RRTMDOoqEn0.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/jlGmlFOcfo8n5tURmhC7YVd4Iyy.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Hayao Miyazaki" vote_average="7.8" year="2013">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/jfwSexzlIzaOgxP9A8bTA6t8YYb.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Wind Rises
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2013
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.8
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Hayao Miyazaki
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/mG3cfxtA5jqDc7fpKgyzZMKoXDh.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/938lqhAQaO3hmLg44VbUR7OqlMs.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Алексей Герман ст." vote_average="6.6" year="2013">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/lmqx4l6JVKwtAe7CCoyzwTVcOpy.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Hard to Be a God
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2013
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.6
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Алексей Герман ст.
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/2oSZBMMQUpvaKgysPw0xi09IKDO.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/iEOKiQs1Exyuu5eNK3MT8pyen0e.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Quentin Tarantino" vote_average="7.9" year="2004">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/2yhg0mZQMhDyvUQ4rG1IZ4oIA8L.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Kill Bill: Vol. 2
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2004
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Quentin Tarantino
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/1gjcpAa99FAOWGnrUvHEXXsRs7o.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/akXPz7zK6NZ8YxGqjcHunGK9bXL.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Ridley Scott" vote_average="8.2" year="1979">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/vfrQk5IPloGg1v9Rzbh2Eg3VGyM.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Alien
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1979
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Ridley Scott
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/zABJmN9opmqD4orWl3KSdCaSo7Q.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/hdHIjZxq3SWFqpAz4NFhdbud0iz.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Daniel Kwan" vote_average="6.9" year="2016">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/8pxn8CQ6SD6tly75lrKw08wfZKv.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Swiss Army Man
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2016
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.9
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Daniel Kwan
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/9OgOnYB8g7cww2LOMfjP6oFE5Qc.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/kmeINuKue6sUsypiVaR9IG0Yi8R.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Wes Anderson" vote_average="7.5" year="2001">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/syaECBy6irxSgeF0m5ltGPNTWXL.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       The Royal Tenenbaums
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2001
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.5
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Wes Anderson
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/b1LH059EGnU01rsZwcqYzNjY7w9.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/g2s22rGjCTCYsjI1iAflem7HjdG.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Fede Álvarez" vote_average="6.6" year="2013">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/1gDV0Lm9y8ufIKzyf0h0GBgb9Zj.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Evil Dead
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2013
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.6
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Fede Álvarez
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/f8KjBkmqAyNGTUkZh1oYIURP4id.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/zL8Xa10zuG97oz31yJorOCCVuZP.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="David Cronenberg" vote_average="6.2" year="2014">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/aoMNfiaMmT7o7wY8oXWCLErZtah.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Maps to the Stars
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2014
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         David Cronenberg
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/3xh4e2gWHDilMLtucHzDGsmJMuQ.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/ytwTVas9vms9dh510TX5i25gV7e.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Alexandre Aja" vote_average="5.4" year="2010">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/lMLS2OFBbNYMSB1ZbVp4q2S4zTU.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Piranha 3D
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2010
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         5.4
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Alexandre Aja
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/qODWbFXeWk3quoDKzhfmAhxn4Dx.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/ouft7rQMa4jTW4aK2zfCfPj68Qn.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Quentin Tarantino" vote_average="8.0" year="2003">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/v7TaX8kXMXs5yFFGR41guUDNcnB.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Kill Bill: Vol. 1
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         2003
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         8.0
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Quentin Tarantino
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/1gjcpAa99FAOWGnrUvHEXXsRs7o.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/lVy5Zqcty2NfemqKYbVJfdg44rK.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="David Lynch" vote_average="6.2" year="1984">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/ldugBX89jCQA9RRwfzRgX0gNpBc.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Dune
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1984
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         David Lynch
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/wwBzRDoIW6Ld64h6OkQ6ImCZKsR.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/5wJ2tckpvwcxGCAgZiccodwEJpf.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="John Boorman" vote_average="7.3" year="1972">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/2TrAzNJlHyNYYSkQf6asg3rs2Xr.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Deliverance
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1972
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         7.3
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         John Boorman
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/jMSpwdhkIsIGskwVE38Bdtazfy1.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/vqOAgTChkDi6w8mdIMu73JdwNxX.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="movie_div Hcontainer" director="Jean-Pierre Jeunet" vote_average="6.2" year="1997">
+    <img height="300" src="http://image.tmdb.org/t/p/w400/9aRDMlU5Zwpysilm0WCWzU2PCFv.jpg" width="200.0"/>
+    <div class="Vcontainer expand">
+     <div class="title_style" id="title">
+      <p class="title_tag2">
+       Alien Resurrection
+      </p>
+     </div>
+     <div class="Hcontainer">
+      <div class="Vcontainer column_info">
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         year
+        </div>
+        <div class="movie_element year" id="year">
+         1997
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         tmdb
+        </div>
+        <div class="movie_element" id="note">
+         6.2
+        </div>
+       </div>
+       <div class="Vcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="movie_element">
+         score
+        </div>
+        <div class="movie_element" id="score">
+         -
+        </div>
+       </div>
+      </div>
+      <div class="Vcontainer">
+       <div class="Hcontainer" style="  background-color: rgba(0, 0, 0, 0.5);">
+        <div class="director_element" id="director" style="font-size: 20px;">
+         Jean-Pierre Jeunet
+        </div>
+        <img height="50" src="http://image.tmdb.org/t/p/w400/4DhPaNaxYnkgxVJHVLyL5gKmKpG.jpg" width="33.333333333333336"/>
+       </div>
+       <img height="170" src="http://image.tmdb.org/t/p/w400/f0dFcDXdF6CGz1P1rDzOhwD9hs8.jpg" width="302.22222222222223"/>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>
